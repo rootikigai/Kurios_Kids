@@ -1,47 +1,54 @@
-"""Simple test script for the agent."""
+"""Interactive CLI for trying Buddy locally."""
 
-from dotenv import load_dotenv
 from agent import CuriousKidAgent
 
-# Load environment variables
-load_dotenv()
+SESSION_ID = "local"
+RESET_WORDS = {"reset", "start over", "forget", "new chat"}
+QUIT_WORDS = {"quit", "exit", "bye"}
 
-def main():
-    print("🌟 Starting Curious Kid AI...\n")
-    
-    # Create agent
+
+def main() -> None:
+    print("\n\U0001f31f Kurios Kids - Buddy is waking up...\n")
+
     try:
-        agent = CuriousKidAgent()
-        print("✅ Agent initialized successfully!\n")
-    except Exception as e:
-        print(f"❌ Error initializing agent: {e}")
+        buddy = CuriousKidAgent()
+    except ValueError as exc:
+        print(f"\u274c {exc}\n")
         return
-    
-    # Interactive loop
-    print("Type 'quit' to exit\n")
-    
+
+    print("\u2705 Buddy is ready.")
+    print("   Type 'reset' to start a fresh chat, or 'quit' to leave.\n")
+
     while True:
-        question = input("🤔 What are you curious about today?: ")
-        
-        if question.lower() in ['quit', 'exit', 'bye']:
-            print("\n👋 Bye! Keep being curious!")
-            break
-        
-        if not question.strip():
+        try:
+            question = input("\U0001f914 What are you curious about? ")
+        except (EOFError, KeyboardInterrupt):
+            print("\n\n\U0001f44b Bye! Keep being curious!\n")
+            return
+
+        command = question.strip().lower()
+
+        if command in QUIT_WORDS:
+            print("\n\U0001f44b Bye! Keep being curious!\n")
+            return
+
+        if command in RESET_WORDS:
+            buddy.reset(SESSION_ID)
+            print("\n\U0001f9f9 Okay, fresh start! I forgot what we talked about.\n")
             continue
-        
-        print("\n💭 Thinking...\n")
-        result = agent.ask(question)
-        
-        if result["success"]:
-            data = result["data"]
-            print(f"{data['fun_emoji']} {data['topic']}")
-            print(f"\n{data['answer']}\n")
-            if data["did_i_search"]:
-                print("🔍 (I searched the web to find this!)\n")
-        else:
-            print(f"❌ {result['data']['answer']}\n")
-            print(f"Error details: {result['error']}\n")
+
+        print("\n\U0001f4ad Thinking...\n")
+        result = buddy.ask(question, session_id=SESSION_ID)
+        data = result["data"]
+
+        print(f"{data['fun_emoji']}  {data['topic']}")
+        print(f"\n{data['answer']}\n")
+
+        if data["did_i_search"]:
+            print("\U0001f50d (I looked this up on the web.)\n")
+        if not result["success"]:
+            print(f"[debug] {result['error']}\n")
+
 
 if __name__ == "__main__":
     main()
