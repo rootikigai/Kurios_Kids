@@ -155,6 +155,7 @@ class CuriousKidAgent:
             }
 
         if contains_blocked_content(data.get("answer", "")):
+            self.reset(session_id)
             return {
                 "success": True,
                 "data": parent_redirect("blocked_output"),

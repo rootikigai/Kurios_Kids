@@ -22,7 +22,7 @@ _PERSONAL_DATA = [
 ]
 
 _INJECTION = [
-    r"ignore (all|any|your|the|previous) (instructions|rules|prompt)",
+    r"ignore (?:(?:all|any|your|the|previous) )+(instructions|rules|prompt)",
     r"\bsystem prompt\b",
     r"\byou are now\b",
     r"\bpretend you are not\b",
